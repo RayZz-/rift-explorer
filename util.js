@@ -4,7 +4,6 @@ const fs = require('fs-extra');
 const yaml = require('yaml');
 const { spawn } = require('child_process');
 const requestPromise = require('request-promise');
-const { mainWindow } = require('./app');
 
 const IS_WIN = process.platform === 'win32';
 const LEAGUE_PROCESS = IS_WIN ? 'LeagueClient.exe' : 'LeagueClient';
@@ -17,7 +16,6 @@ function getLCUExecutableFromProcess() {
 
         cp.exec(command, (error, stdout, stderr) => {
             if (error || !stdout || stderr) {
-                if (IS_WIN) mainWindow.webContents.send('no-wmic');
                 reject(error || stderr);
                 return;
             }
@@ -56,7 +54,6 @@ async function duplicateSystemYaml() {
     try {
         await fs.outputFile(overrideSystemFile, `---\n${stringifiedFile}`);
     } catch (e) {
-        mainWindow.webContents.send('cant-write');
     }
 }
 

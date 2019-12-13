@@ -19,4 +19,4 @@ trim_trailing_whitespace = false
 # NODE PROJECTS
 [{bower.json,package.json,.travis.yml}]
 indent_style = space
-indent_size = 2
+indent_size = 4

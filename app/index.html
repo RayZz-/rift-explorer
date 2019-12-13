@@ -90,14 +90,6 @@
                 messageBar.innerHTML = 'Restarting League...';
             });
 
-            IPC.on('no-wmic', () => {
-                messageBar.innerHTML = 'ERROR: WMIC unavailable.';
-            });
-
-            IPC.on('cant-write', () => {
-                messageBar.innerHTML = 'ERROR: Unable to write to the league directory.';
-            });
-
             IPC.on('lcu-unload', () => {
                 LCUData = null;
                 swaggerContainer.innerHTML = '';

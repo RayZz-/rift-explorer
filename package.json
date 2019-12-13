@@ -10,14 +10,16 @@
   "author": "Robert Manolea <manolea.robert@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "find-process": "^1.4.3",
     "fs-extra": "^8.1.0",
     "lcu-connector": "^2.1.2",
     "request": "^2.88.0",
     "request-promise": "^4.2.5",
+    "uuid": "^3.3.3",
     "yaml": "^1.7.2"
   },
   "devDependencies": {
-    "electron": "^7.1.1",
+    "electron": "^7.1.2",
     "electron-builder": "^22.1.0",
     "eslint": "^6.6.0",
     "eslint-config-airbnb-base": "^14.0.0",
