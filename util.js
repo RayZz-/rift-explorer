@@ -17,6 +17,8 @@ function getLCUExecutableFromProcess() {
         cp.exec(command, (error, stdout, stderr) => {
             if (error || !stdout || stderr) {
                 reject(error || stderr);
+                console.error(error);
+                console.error(stderr);
                 return;
             }
             const normalizedPath = path.normalize(stdout);
@@ -54,14 +56,12 @@ async function duplicateSystemYaml() {
     try {
         await fs.outputFile(overrideSystemFile, `---\n${stringifiedFile}`);
     } catch (e) {
+        console.error(e);
     }
 }
 
 function restartLCUWithOverride(LCUData) {
     return new Promise(async (resolve) => {
-        const LCUExePath = await getLCUExecutableFromProcess();
-        const LCUDir = IS_WIN ? path.dirname(LCUExePath) : `${path.dirname(LCUExePath)}/../../..`;
-
         const {
             username,
             password,
@@ -74,18 +74,29 @@ function restartLCUWithOverride(LCUData) {
             method: 'POST',
             uri: `https://${username}:${password}@${address}:${port}/process-control/v1/process/quit`,
         });
+        getLCUExecutableFromProcess().then((LCUExePath) => {
+            const LCUDir = IS_WIN ? path.dirname(LCUExePath) : `${path.dirname(LCUExePath)}/../../..`;
+            // Give it some time to do cleanup
+            setTimeout(async () => {
+                try {
+                    const leagueProcess = spawn(LCUExePath.trim(), [`--system-yaml-override=${await getOverrideFilePath()}`], {
+                        cwd: LCUDir,
+                        detached: true,
+                        stdio: 'ignore',
+                    });
 
-        // Give it some time to do cleanup
-        setTimeout(async () => {
-            const leagueProcess = spawn(LCUExePath.trim(), [`--system-yaml-override=${await getOverrideFilePath()}`], {
-                cwd: LCUDir,
-                detached: true,
-                stdio: 'ignore',
-            });
+                    leagueProcess.on('error', (error) => {
+                        console.error(error);
+                    })
 
-            leagueProcess.unref();
-            resolve();
-        }, 5000);
+                    leagueProcess.unref();
+                } catch (e) {
+                    console.error('ERROR DURING RESTARTING WITH OVERRIDE')
+                    console.error(e);
+                }
+                resolve();
+            }, 5000);
+        });
     });
 }
 
